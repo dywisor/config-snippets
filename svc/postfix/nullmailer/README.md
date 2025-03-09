@@ -34,4 +34,13 @@ postfix check
 
 systemctl restart postfix
 systemctl enable postfix
+
+
+# sendmail test
+sendmail -oi -t << 'EOF'
+From: <foo@SENDER_DOMAIN>
+To: <bar@RCPT_DOMAIN>
+Subject: Test
+
+EOF
 ```
