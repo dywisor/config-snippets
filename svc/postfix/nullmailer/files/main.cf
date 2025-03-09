@@ -1,0 +1,75 @@
+# /etc/postfix/main.cf
+# See /usr/share/postfix/main.cf.dist for a commented, more complete version
+
+compatibility_level                 = 3.8
+parent_domain_matches_subdomains    =
+biff                                = no
+append_dot_mydomain                 = no
+
+myorigin                            = mail.example
+myhostname                          = hostname.example
+mydestination                       = $myhostname
+smtpd_banner                        = $myhostname ESMTP
+#smtp_helo_name                      = $myhostname
+
+mynetworks_style                    = host
+mynetworks                          = 127.0.0.0/8 [::1]/128
+#inet_protocols                      = ipv4
+#inet_interfaces                     =
+#smtp_bind_address                   = 0.0.0.0
+#smtp_bind_address6                  = ::
+
+# deliver via upstream SMTP gateway
+relayhost                           = [198.51.100.1], [198.51.100.2]
+mailbox_transport                   = error:local mail delivery is disabled
+
+
+
+alias_database                      = hash:/etc/postfix/aliases
+alias_maps                          = $alias_database
+local_recipient_maps                = $alias_maps
+sender_canonical_maps               = hash:/etc/postfix/sender_canonical
+recipient_delimiter                 =
+
+delay_warning_time                  = 0h
+
+
+# message size limit: 10M
+message_size_limit                  = 10000000
+disable_vrfy_command                = yes
+allow_untrusted_routing             = no
+ignore_mx_lookup_error              = no
+#allow_percent_hack                  = no
+# Postfix >= 3.8:
+ignore_srv_lookup_error             = no
+# https://www.postfix.org/DSN_README.html
+smtpd_discard_ehlo_keywords         = silent-discard, dsn
+
+# safety net if smtpd is enabled: reject messages
+smtpd_helo_required                 = yes
+#smtpd_client_restrictions           =
+smtpd_helo_restrictions             = reject
+smtpd_sender_restrictions           = reject
+smtpd_recipient_restrictions        = reject
+smtpd_relay_restrictions            = reject
+smtpd_data_restrictions             = reject
+#smtpd_end_of_data_restrictions      =
+smtpd_etrn_restrictions             = reject
+
+unknown_address_reject_code         = 550
+unknown_client_reject_code          = 550
+unknown_hostname_reject_code        = 550
+unverified_recipient_reject_code    = 550
+unverified_sender_reject_code       = 550
+unknown_local_recipient_reject_code = 550
+plaintext_reject_code               = 550
+
+# Use TLS for outbound mail
+# https://www.postfix.org/TLS_README.html
+# https://www.postfix.org/postconf.5.html
+smtp_tls_loglevel                   = 1
+smtp_tls_security_level             = encrypt
+smtp_tls_mandatory_protocols        = >=TLSv1.2
+smtp_tls_mandatory_ciphers          = high
+smtp_tls_ciphers                    = $smtp_tls_mandatory_ciphers
+smtp_tls_protocols                  = $smtp_tls_mandatory_protocols

@@ -1,0 +1,3 @@
+# See man 5 canonical for format
+root: foo@mail.example
+postmaster: foo@mail.example
